@@ -38,7 +38,7 @@ public class UdpObjectClient {
 
         // * 3、将数据封装成DatagramPacket包裹，需要指定目的地
         DatagramPacket packet;
-        packet = new DatagramPacket(datas, 0, datas.length,
+        packet = new DatagramPacket(datas, datas.length,
                 new InetSocketAddress("localhost", 9999));
 
         // * 4、发送包裹 send(DatagramPacket p)
