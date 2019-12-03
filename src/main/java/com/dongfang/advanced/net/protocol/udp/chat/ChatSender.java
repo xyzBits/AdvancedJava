@@ -10,6 +10,7 @@ import java.net.SocketException;
 
 /**
  * 发送端：使用面向对象封装
+ * 发送端要同时指定接收端的ip和port
  */
 public class ChatSender implements Runnable {
     private DatagramSocket client;
