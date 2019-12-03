@@ -28,6 +28,7 @@ public class UdpServer {
 
         // * 2、装备容器，封装成DatagramPacket包裹
         byte[] container = new byte[1024 * 60];
+        // 构造 DatagramPacket，用来接收长度为 length 的数据包
         DatagramPacket packet = new DatagramPacket(container, container.length);
 
         // * 3、阻塞式接收包裹 receive(DatagramPacket p)
