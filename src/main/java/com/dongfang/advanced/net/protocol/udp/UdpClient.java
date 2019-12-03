@@ -37,6 +37,8 @@ public class UdpClient {
 
         // * 3、将数据封装成DatagramPacket包裹，需要指定目的地
         DatagramPacket packet;
+        // 构造数据报包，用来将长度为 length 的包发送到指定主机上
+的指定端口
         packet = new DatagramPacket(datas, datas.length,
                 new InetSocketAddress("localhost", 9999));
 
