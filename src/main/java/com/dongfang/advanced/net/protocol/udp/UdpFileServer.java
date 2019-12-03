@@ -30,7 +30,7 @@ public class UdpFileServer {
 
         // * 2、装备容器，封装成DatagramPacket包裹
         byte[] container = new byte[1024 * 60];
-        DatagramPacket packet = new DatagramPacket(container, 0, container.length);
+        DatagramPacket packet = new DatagramPacket(container, container.length);
 
         // * 3、阻塞式接收包裹 receive(DatagramPacket p)
         server.receive(packet);
