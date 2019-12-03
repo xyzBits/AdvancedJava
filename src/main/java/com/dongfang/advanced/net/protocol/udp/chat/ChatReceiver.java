@@ -27,7 +27,7 @@ public class ChatReceiver implements Runnable {
         while (true) {
             try {
                 byte[] container = new byte[1024 * 60];
-                DatagramPacket packet = new DatagramPacket(container, 0, container.length);
+                DatagramPacket packet = new DatagramPacket(container, container.length);
                 server.receive(packet);
                 byte[] datas = packet.getData();
                 int len = packet.getLength();
