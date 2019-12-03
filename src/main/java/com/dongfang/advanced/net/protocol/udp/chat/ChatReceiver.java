@@ -7,6 +7,7 @@ import java.net.SocketException;
 
 /**
  * 接收端：使用面向对象封装
+ * 接收端只要指定端口进行监听就可以了
  */
 public class ChatReceiver implements Runnable {
     private DatagramSocket server;
