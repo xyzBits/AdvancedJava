@@ -3,6 +3,7 @@ package com.dongfang.advanced.net.protocol.udp;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 /**
  * java.net.BindException: Address already in use: Cannot bind
@@ -33,6 +34,7 @@ public class UdpServer {
 
         // * 3、阻塞式接收包裹 receive(DatagramPacket p)
         server.receive(packet);
+        System.out.println("收到packet");
 
         // * 4、分析数据
         // *      byte[] getData()

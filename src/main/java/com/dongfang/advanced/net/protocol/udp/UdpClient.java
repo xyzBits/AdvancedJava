@@ -40,6 +40,8 @@ public class UdpClient {
         // 构造数据报包，用来将长度为 length 的包发送到指定主机上的指定端口
         packet = new DatagramPacket(datas, datas.length,
                 new InetSocketAddress("localhost", 9999));
+        InetSocketAddress address =  new InetSocketAddress("localhost", 9999);
+        System.out.println(address.getAddress());
 
         // * 4、发送包裹 send(DatagramPacket p)
         client.send(packet);
