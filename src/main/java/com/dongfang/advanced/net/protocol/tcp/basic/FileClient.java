@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * 文件下载服务器：单向
+ * 文件下载服务器：单向245
  */
 public class FileClient {
     public static void main(String[] args) throws IOException {
