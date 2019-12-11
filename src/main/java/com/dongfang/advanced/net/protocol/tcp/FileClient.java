@@ -1,4 +1,4 @@
-package com.dongfang.advanced.net.protocol.tcp.basic;
+package com.dongfang.advanced.net.protocol.tcp;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

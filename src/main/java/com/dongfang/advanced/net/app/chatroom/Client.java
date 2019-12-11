@@ -1,4 +1,4 @@
-package com.dongfang.advanced.net.protocol.tcp.chatroom;
+package com.dongfang.advanced.net.app.chatroom;
 
 import java.io.BufferedReader;
 import java.io.IOException;
