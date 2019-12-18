@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<persons>
+    <person>
+        <name>东方不败</name>
+        <age>9000</age>
+    </person>
+
+    <person>
+        <name>西方失败</name>
+        <age>8000</age>
+    </person>
+</persons>

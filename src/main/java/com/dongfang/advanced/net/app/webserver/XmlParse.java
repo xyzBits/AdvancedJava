@@ -33,6 +33,8 @@ public class XmlParse {
         // 5、解析
         parser.parse("D:\\ubuntu\\learn\\JavaWeb\\MavenProject\\maven03\\AdvancedJava\\src\\main\\resources\\xml-conf\\person.xml", handler);
 
+        System.out.println("handler.getPersons() = " + handler.getPersons());
+
 
     }
 
@@ -40,6 +42,10 @@ public class XmlParse {
         private List<Person> persons;
         private Person person;
         private String tag; //存储操作标签
+
+        public List<Person> getPersons() {
+            return persons;
+        }
 
         @Override
         public void startDocument() throws SAXException {
@@ -67,10 +73,12 @@ public class XmlParse {
                 System.out.println("内容为--->空");
             }*/
 
-            if (tag.equals("name")) {
-                person.setName(contents);
-            } else if (tag.equals("age")) {
-                person.setAge(Integer.parseInt(contents));
+            if (tag != null) {
+                if (tag.equals("name")) {
+                    person.setName(contents);
+                } else if (tag.equals("age")) {
+                    person.setAge(Integer.parseInt(contents));
+                }
             }
 
         }
@@ -78,9 +86,13 @@ public class XmlParse {
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             System.out.println(qName + "------> 解析结束");
-            if (tag.equals("person")) {
-                persons.add(person);
+            if (qName != null) {
+                if (qName.equals("person")) {
+                    persons.add(person);
+                }
             }
+
+            tag = null;
         }
 
         @Override
@@ -115,6 +127,17 @@ public class XmlParse {
 
         public void setAge(int age) {
             this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder("{");
+            sb.append("\"name\":\"")
+                    .append(name).append('\"');
+            sb.append(",\"age\":")
+                    .append(age);
+            sb.append('}');
+            return sb.toString();
         }
     }
 }
