@@ -7,7 +7,7 @@
 
     <servlet>
         <servlet-name>FirstHttpServlet</servlet-name>
-        <servlet-class>com.dongfang.javaweb.servlet.ch1_http.FirstHttpServlet</servlet-class>
+        <servlet-class>com.dongfang.advanced.net.app.webserver.FirstServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -18,12 +18,12 @@
 
 
     <servlet>
-        <servlet-name>EncodingServlet</servlet-name>
-        <servlet-class>com.dongfang.javaweb.servlet.ch1_http.EncodingServlet</servlet-class>
+        <servlet-name>HelloServlet</servlet-name>
+        <servlet-class>com.dongfang.advanced.net.app.webserver.HelloServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>EncodingServlet</servlet-name>
-        <url-pattern>/encodingServlet</url-pattern>
+        <servlet-name>HelloServlet</servlet-name>
+        <url-pattern>/helloServlet</url-pattern>
     </servlet-mapping>
 
 </web-app>

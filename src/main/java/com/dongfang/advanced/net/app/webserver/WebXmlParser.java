@@ -1,5 +1,6 @@
 package com.dongfang.advanced.net.app.webserver;
 
+import com.dongfang.advanced.net.app.webserver.servlet.Servlet;
 import org.junit.Test;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -9,12 +10,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WebXmlParser {
     @Test
-    public void test001() throws IOException, SAXException, ParserConfigurationException {
+    public void test001() throws IOException, SAXException, ParserConfigurationException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         // SAX解析
         // 1、获取解析工厂
         SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -33,6 +35,13 @@ public class WebXmlParser {
 //        System.out.println("handler.getEntities() = " + handler.getEntities());
 //        System.out.println("handler.getMappings() = " + handler.getMappings());
         WebContext webContext = new WebContext(handler.getEntities(), handler.getMappings());
+
+        // 假设输入了/firstHttpServlet
+        String servletClassName = webContext.getServletClassName("/helloServlet");
+        Class aClass = Class.forName(servletClassName);
+        Servlet servlet = (Servlet) aClass.getConstructor().newInstance();
+        System.out.println(servlet.getClass());
+        servlet.service();
 
     }
 
