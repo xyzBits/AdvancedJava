@@ -1,4 +1,4 @@
-package com.dongfang.advanced.net.app.webserver;
+package com.dongfang.advanced.net.app.webserver.core;
 
 /**
  *     <servlet>
