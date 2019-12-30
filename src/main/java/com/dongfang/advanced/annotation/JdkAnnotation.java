@@ -45,8 +45,8 @@ public class JdkAnnotation {
     public void callTestDeprecated() {
         testDeprecated();
         Date date = new Date();
-        long parse = date.parse("2019-12-25");
-        System.out.println("parse = " + parse);
+//        long parse = date.parse("2019-12-25");
+//        System.out.println("parse = " + parse);
     }
 
 
