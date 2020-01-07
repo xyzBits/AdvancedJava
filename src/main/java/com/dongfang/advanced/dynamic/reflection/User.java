@@ -1,9 +1,25 @@
 package com.dongfang.advanced.dynamic.reflection;
 
+import java.util.Date;
+
 public class User {
     private int id;
     private String name;
     private int age;
+
+    public int testGetFields;
+
+    public int getTestGetFields() {
+        return testGetFields;
+    }
+
+    public void setTestGetFields(int testGetFields) {
+        this.testGetFields = testGetFields;
+    }
+
+    private User(int testGetFields) {
+        this.testGetFields = testGetFields;
+    }
 
     public User() {
     }
@@ -31,4 +47,6 @@ public class User {
     public void setAge(int age) {
         this.age = age;
     }
+
+    private void testPrivateMethod(Date date) {}
 }

@@ -2,6 +2,9 @@ package com.dongfang.advanced.dynamic.reflection;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Date;
+
 /**
  * 动态语言     运行时改变程序的结构
  *      程序运行时，可以改变程序结构或者变量类型，典型的python ruby javascript
@@ -28,6 +31,7 @@ import org.junit.Test;
  */
 public class ReflectionDemo {
 
+    private static String path = "com.dongfang.advanced.dynamic.reflection.User";
     /**
     * 一个类被 加载后，jvm会创建一个此类的Class对象，这个对象中封装了类的整个结构信息
      * 一个类只对应一个Class对象
@@ -39,58 +43,55 @@ public class ReflectionDemo {
      *      4、基本类型，数组（与维数有关） void
     * */
     @Test
-    public void testGetClassObject() {
-        String path = "com.dongfang.advanced.dynamic.reflection.User";
-        try {
-            // 1、全类名
-            Class<?> clazz = Class.forName(path);
-            System.out.println("clazz = " + clazz);
-            System.out.println("Class.forName(path).equals(clazz) = " + Class.forName(path).equals(clazz));
+    public void testGetClassObject() throws ClassNotFoundException {
+        // 1、全类名
+        Class<?> clazz = Class.forName(path);
+        System.out.println("clazz = " + clazz);
+        System.out.println("Class.forName(path).equals(clazz) = " + Class.forName(path).equals(clazz));
 
-            // 2、类型
-            Class<String> stringClass = String.class;
+        // 2、类型
+        Class<String> stringClass = String.class;
 
-            // 3、对象
-            Class<? extends String> aClass = "Hello World".getClass();
-            System.out.println("stringClass.equals(aClass) = " + stringClass.equals(aClass));
-
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        // 3、对象
+        Class<? extends String> aClass = "Hello World".getClass();
+        System.out.println("stringClass.equals(aClass) = " + stringClass.equals(aClass));
     }
 
+    /**
+     * 反应投身API，获取类的信息（类的名字、属性、方法、构造器）
+     * getDeclaredXxx()获取类中声明的构造器，方法，获取指定的方法，要传方法名，参数类型.class
+     * getXXX()         获取类中和父类中代开的构造器方法，获取指定方法，要传方法名，参数类型.class
+     */
+    @Test
+    public void testGetClassInformation() throws ClassNotFoundException, NoSuchFieldException, NoSuchMethodException {
+        Class<?> aClass = Class.forName(path);
+        // 1、包与包名
+        System.out.println("aClass.getPackage() = " + aClass.getPackage());
+        System.out.println("aClass.getPackageName() = " + aClass.getPackageName());
 
+        // 2、类名
+        System.out.println("aClass.getName() full name = " + aClass.getName());
+        System.out.println("aClass.getSimpleName() = " + aClass.getSimpleName());
 
+        // 3、属性
+        System.out.println("aClass.getDeclaredFields() = " + Arrays.toString(aClass.getDeclaredFields()));
+        System.out.println("aClass.getFields() = " + Arrays.toString(aClass.getFields())); // 只能获取public的属性
+        System.out.println("aClass.getDeclaredField(\"id\") = " + aClass.getDeclaredField("id"));
 
+        // 4、构造器
+        System.out.println("aClass.getDeclaredConstructors() = " + Arrays.toString(aClass.getDeclaredConstructors()));
+        System.out.println("aClass.getConstructors() = " + Arrays.toString(aClass.getConstructors()));
+        System.out.println("aClass.getDeclaredConstructor(int.class) = " + aClass.getDeclaredConstructor(int.class));
 
+        // 5、方法
+        System.out.println("aClass.getDeclaredMethods() = " + Arrays.toString(aClass.getDeclaredMethods())); // 类中声明的所有方法
+        System.out.println("aClass.getMethods() = " + Arrays.toString(aClass.getMethods())); // 公开方法，包含父类的
+        System.out.println("aClass.getDeclaredMethod(\"testPrivateMethod\", Date.class) = " + aClass.getDeclaredMethod("testPrivateMethod", Date.class));
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @Test
+    public void testUseClassInformation() {
+        
+    }
 
 }
