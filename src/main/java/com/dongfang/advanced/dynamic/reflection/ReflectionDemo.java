@@ -1,9 +1,19 @@
 package com.dongfang.advanced.dynamic.reflection;
 
+import com.dongfang.advanced.annotation.TableMapping;
 import org.junit.Test;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 动态语言     运行时改变程序的结构
@@ -28,7 +38,27 @@ import java.util.Date;
  *              4、动态调用和处理属性
  *              5、获取泛型信息
  *              6、处理注解
+ *
+ *        反制机制的性能问题：
+ *              setAccessible
+ *                  --启用和禁用访问安全检查的开关，值为true时，则指示反射的对象在使用时应该取消java语言访问检查
+ *                     值为false时，则指示应该实施java语言访问检查，并不是为true就能访问，为false就不能访问
+ *                  -- 禁止安全检查，可以提高反射的运行速度
+ *                     可以使用cglib java assist字节码操作库
+ *
+ *        反射操作泛型：
+ *              Java采用泛型擦除的机制来引入泛型，Java中的泛型仅仅是给编译器java以使用的，确保数据的安全性和免去强制类型转换的麻烦
+ *              但是，一旦编译完成，所有的和泛型相关类型全部都擦除
+ *
+ *              为了通过反射操作这些类型，以迎合实际开发的需要，java新增了ParameterizedType GenericArrayType
+ *              TypeVariable WildcardType几种类型来代表不能被扫到Class类中的类型但是又和原始类型齐名的类型
+ *                  ParameterizedType 表示一种参数化的类型 比如Collection<String>
+ *                  GenericArrayType  表示一种元素类型是参数化类型或者类型变量的数组类型
+ *                  TypeVariable      是各种类型变量的公共父接口
+ *                  WildcardType代表一种通配符表达式 比如？ extend Number ? super Integer
+ *
  */
+@SuppressWarnings("all")
 public class ReflectionDemo {
 
     private static String path = "com.dongfang.advanced.dynamic.reflection.User";
@@ -89,9 +119,139 @@ public class ReflectionDemo {
         System.out.println("aClass.getDeclaredMethod(\"testPrivateMethod\", Date.class) = " + aClass.getDeclaredMethod("testPrivateMethod", Date.class));
     }
 
+    /**
+     * 使用反射的信息
+     *      1、创建对象，推荐用构造器的newInstance方法
+     *      2、调用方法 method.invoke(object, args)
+     *      3、设置属性，setAccessible() 可修改私有属性
+     */
     @Test
-    public void testUseClassInformation() {
-        
+    public void testUseClassInformation() throws ClassNotFoundException, IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, NoSuchFieldException {
+        Class<?> aClass = Class.forName(path);
+
+        // 1、创建对象 class.newInstance()过时方法
+        User user = (User) aClass.newInstance();
+
+        // 1、创建对象，获得构造器后，调用构造器的newInstance(args)
+        Constructor<?> declaredConstructor = aClass.getDeclaredConstructor(int.class, String.class, int.class);
+        User dongFang = (User) declaredConstructor.newInstance(1, "Dong fang", 20);
+        System.out.println("dongFang = " + dongFang);
+
+        // 2、操作方法，method.invoke(object) 传入构造器创建的对象
+        // 无参方法，获取时不用填参数类型
+        Method hello = aClass.getDeclaredMethod("hello");
+        hello.invoke(dongFang);
+
+        // 3、操作属性，私有属性要设置可访问，可以set设置属性的新值
+        Field nameField = aClass.getDeclaredField("name");
+        nameField.setAccessible(true);
+        nameField.set(dongFang, "Xi fang");
+        System.out.println("dongFang = " + dongFang);
     }
 
+
+    /**
+     * 频繁调用反射时，setAccessible(true) 性能提交4倍
+     */
+    @Test
+    public void testReflectionPerformance() throws NoSuchMethodException, ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
+        long frequency = 100_000_000_000L;
+        User user = new User();
+        long time1 = System.currentTimeMillis();
+        for (long i = 0; i < frequency; i++) {
+            user.getName();
+        }
+        long time2 = System.currentTimeMillis();
+        System.out.println("origin  = " + (time2 - time1));
+
+        Class<?> aClass = Class.forName(path);
+        User user1 = (User) aClass.newInstance();
+        Method getName = aClass.getDeclaredMethod("getName");
+        getName.setAccessible(false);
+        time1 = System.currentTimeMillis();
+        for (long i = 0; i < frequency; i++) {
+            getName.invoke(user1);
+        }
+        time2 = System.currentTimeMillis();
+        System.out.println("setAccessible false = " + (time2 - time1));
+
+        getName.setAccessible(true);
+        time1 = System.currentTimeMillis();
+        for (long i = 0; i < frequency; i++) {
+            getName.invoke(user1);
+        }
+        time2 = System.currentTimeMillis();
+        System.out.println("setAccessible true  = " + (time2 - time1));
+    }
+
+    /**
+     * 通过反制获取泛型
+     *      getGenericParameterTypes
+     *      getGenericReturnType
+     */
+    @Test
+    public void testGeneric() throws ClassNotFoundException, NoSuchMethodException {
+        Class<?> aClass = Class.forName(path);
+        Method testGeneric = aClass.getDeclaredMethod("testGeneric", Map.class, List.class);
+        Type[] genericParameterTypes = testGeneric.getGenericParameterTypes();
+        for (Type parameterType : genericParameterTypes) {
+            System.out.println("#" + parameterType);
+            if (parameterType instanceof ParameterizedType) {
+                Type[] actualTypeArguments = ((ParameterizedType) parameterType).getActualTypeArguments();
+                for (Type actualTypeArgument : actualTypeArguments) {
+                    System.out.println("泛型类型：" + actualTypeArgument);
+                }
+            }
+        }
+        System.out.println();
+
+        // 获取返回值的泛型
+        Type genericReturnType = testGeneric.getGenericReturnType();
+        if (genericReturnType instanceof ParameterizedType) {
+            System.out.println("#" + genericReturnType);
+            Type[] actualTypeArguments = ((ParameterizedType) genericReturnType).getActualTypeArguments();
+            for (Type actualTypeArgument : actualTypeArguments) {
+                System.out.println("泛型类型：" + actualTypeArgument);
+            }
+        }
+    }
+
+
+    /**
+     * 通过反制获取注解
+     *      1、获取类上的注解
+     *          1-1、获取所有注解
+     *          1-2、获取某个注解
+     *      2、获取属性，方法，构造器上的注解，
+     *          2-1、先获取属性，方法，构造器
+     *          2-2、获取所有注解，获取某个注解
+     */
+    @Test
+    public void testGetAnnotation() throws ClassNotFoundException, NoSuchFieldException {
+        String fullName = "com.dongfang.advanced.annotation.Student";
+        Class<?> aClass = Class.forName(fullName);
+        // 获取类上的所有注解
+        Annotation[] annotations = aClass.getAnnotations();
+        System.out.println("annotations = " + Arrays.deepToString(annotations));
+
+        // 获取类上的指定注解
+        System.out.println("aClass.getDeclaredAnnotation(TableMapping.class) = " + aClass.getDeclaredAnnotation(TableMapping.class));
+
+        //
+        Field nameField = aClass.getDeclaredField("studentName");
+        System.out.println("nameField.getDeclaredAnnotations() = " + Arrays.deepToString(nameField.getDeclaredAnnotations()));
+    }
+
+    /**
+     * 获取方法参数上的注解
+     */
+    @Test
+    public void testGetMethodInformation() throws ClassNotFoundException, NoSuchMethodException {
+        Class<?> aClass = Class.forName(path);
+        Method testParamAnnotation = aClass.getDeclaredMethod("testParamAnnotation", String.class, int.class);
+        Annotation[][] parameterAnnotations = testParamAnnotation.getParameterAnnotations();
+        for (Annotation[] parameterAnnotation : parameterAnnotations) {
+            System.out.println("Arrays.toString(parameterAnnotation) = " + Arrays.toString(parameterAnnotation));
+        }
+    }
 }

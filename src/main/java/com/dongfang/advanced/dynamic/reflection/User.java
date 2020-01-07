@@ -1,6 +1,10 @@
 package com.dongfang.advanced.dynamic.reflection;
 
+import com.dongfang.advanced.annotation.TableMapping;
+
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class User {
     private int id;
@@ -21,7 +25,14 @@ public class User {
         this.testGetFields = testGetFields;
     }
 
+    public User(int id, String name, int age) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+    }
+
     public User() {
+        System.out.println("反射正在调用无参构造器");
     }
 
     public int getId() {
@@ -49,4 +60,30 @@ public class User {
     }
 
     private void testPrivateMethod(Date date) {}
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("{");
+        sb.append("\"id\":")
+                .append(id);
+        sb.append(",\"name\":\"")
+                .append(name).append('\"');
+        sb.append(",\"age\":")
+                .append(age);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    public void hello() {
+        System.out.println("hello " + name);
+    }
+
+    public Map<Integer, User> testGeneric(Map<String, User> map, List<User> list) {
+        System.out.println("testGeneric(Map<String, User> map, List<User> list)");
+        return null;
+    }
+
+    public void testParamAnnotation(@TableMapping("arg") @Deprecated String arg, @TableMapping("height") int height) {
+
+    }
 }
