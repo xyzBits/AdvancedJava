@@ -1,4 +1,4 @@
-package com.dongfang.advanced.dynamic.reflection;
+package com.dongfang.advanced.dynamic;
 
 import com.dongfang.advanced.annotation.TableMapping;
 import org.junit.Test;
@@ -61,7 +61,7 @@ import java.util.Map;
 @SuppressWarnings("all")
 public class ReflectionDemo {
 
-    private static String path = "com.dongfang.advanced.dynamic.reflection.User";
+    private static String path = "com.dongfang.advanced.dynamic.User";
     /**
     * 一个类被 加载后，jvm会创建一个此类的Class对象，这个对象中封装了类的整个结构信息
      * 一个类只对应一个Class对象

@@ -1,4 +1,4 @@
-package com.dongfang.advanced.dynamic.reflection;
+package com.dongfang.advanced.dynamic;
 
 import com.dongfang.advanced.annotation.TableMapping;
 
