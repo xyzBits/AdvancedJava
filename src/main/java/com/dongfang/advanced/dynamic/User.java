@@ -74,8 +74,8 @@ public class User {
         return sb.toString();
     }
 
-    public void hello() {
-        System.out.println("hello " + name);
+    public void hello(String arg) {
+        System.out.println("hello " + arg);
     }
 
     public Map<Integer, User> testGeneric(Map<String, User> map, List<User> list) {
