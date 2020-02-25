@@ -8,6 +8,10 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * 单例模式的核心就是使得一个类只有一个对象
+ */
+@SuppressWarnings("all")
 public class SingletonDemo {
     @Test
     public void testStaticSingleton() {
