@@ -3,6 +3,7 @@ package com.dongfang.advanced.designpatterns.creational.factory;
 import org.junit.Test;
 
 /**
+ * https://www.cnblogs.com/zhangchenliang/p/3700820.html
  * 工厂方法，涉及四个类
  *      产品接口
  *      产品实现
