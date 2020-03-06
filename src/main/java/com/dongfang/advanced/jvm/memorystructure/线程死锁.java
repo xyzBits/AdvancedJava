@@ -3,13 +3,14 @@ package com.dongfang.advanced.jvm.memorystructure;
 /**
  * 演示线程死锁
  */
-class A {
-};
-
-class B {
-};
 
 public class 线程死锁 {
+
+    private static class A {
+    }
+
+    private static class B {
+    }
     static A a = new A();
     static B b = new B();
 
