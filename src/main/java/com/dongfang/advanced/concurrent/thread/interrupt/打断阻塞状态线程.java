@@ -1,4 +1,4 @@
-package com.dongfang.advanced.concurrent.thread;
+package com.dongfang.advanced.concurrent.thread.interrupt;
 
 import java.util.Date;
 

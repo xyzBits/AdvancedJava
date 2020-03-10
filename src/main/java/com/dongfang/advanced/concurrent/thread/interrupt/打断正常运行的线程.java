@@ -1,4 +1,4 @@
-package com.dongfang.advanced.concurrent.thread;
+package com.dongfang.advanced.concurrent.thread.interrupt;
 
 public class 打断正常运行的线程 {
     public static void main(String[] args) {
