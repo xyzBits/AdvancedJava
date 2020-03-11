@@ -1,4 +1,4 @@
-package com.dongfang.advanced.jvm.memorystructure;
+package com.dongfang.advanced.jvm.memorystructure.stringtable;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

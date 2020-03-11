@@ -1,4 +1,4 @@
-package com.dongfang.advanced.jvm.memorystructure;
+package com.dongfang.advanced.jvm.memorystructure.stringtable;
 
 /**
  * 调整StringTable对应的hashtable的桶的个数
