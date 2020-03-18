@@ -1,8 +1,10 @@
+/*
 package com.dongfang.advanced.jvm.memorystructure;
 
 import jdk.internal.org.objectweb.asm.ClassWriter;
 import jdk.internal.org.objectweb.asm.Opcodes;
 
+*/
 /**
  * 演示元空间内存溢出 java.lang.OutOfMemoryError: Metaspace
  * -XX:MaxMetaspaceSize=8m
@@ -12,7 +14,8 @@ import jdk.internal.org.objectweb.asm.Opcodes;
  *
  * * 演示元空间内存溢出 java.lang.OutOfMemoryError: Metaspace
  * * -XX:MaxMetaspaceSize=8m
- */
+ *//*
+
 public class 方法区内存溢出 extends ClassLoader { // 可以用来加载类的二进制字节码
     public static void main(String[] args) {
         int j = 0;
@@ -32,4 +35,4 @@ public class 方法区内存溢出 extends ClassLoader { // 可以用来加载�
             System.out.println(j);
         }
     }
-}
+}*/

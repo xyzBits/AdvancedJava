@@ -20,5 +20,4 @@ public class BlockingQueue<T> {
     // 5、容量
     private int capacity;
 
-
 }
