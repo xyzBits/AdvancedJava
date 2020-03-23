@@ -98,6 +98,15 @@
             <version>2.6</version>
         </dependency>
 
+
+        <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
+        <!--jedis客户端 -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+
     </dependencies>
 
 
