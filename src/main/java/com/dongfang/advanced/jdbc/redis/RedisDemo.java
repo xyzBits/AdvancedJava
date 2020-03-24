@@ -1,9 +1,14 @@
 package com.dongfang.advanced.jdbc.redis;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RedisDemo {
     private String host = "localhost";
@@ -60,8 +65,67 @@ public class RedisDemo {
         }
     }
 
+    /**
+     * jedis完成对hash类型的操作
+     *      1、hash存储一个对象
+     *          判断redis中是否存在该key，如果存在，直接返回对应值
+     *          如果不存在，查询数据库，并将查询的结果存入redis，并返回给用户
+     */
     @Test
     public void testHash() {
+        String key = "users";
+        if (jedis.exists(key)) {
+            Map<String, String> map = jedis.hgetAll(key);
+            System.out.println("jedis.hget(key, \"name\") = " + jedis.hget(key, "name"));
+            System.out.println("从redis中查询的结果--->");
+            System.out.println(map.get("id") + "\t" + map.get("name") + "\t" + map.get("age") + "\t" + map.get("remark"));
+        } else {
+            // 赋值查询并返回
+            jedis.hset(key, "id", "1");
+            jedis.hset(key, "name", "dongfang");
+            jedis.hset(key, "age", "22");
+            jedis.hset(key, "remark", "nan ");
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
+    static
+    class User {
+        private int id;
+        private String userName;
+        private String password;
+        private int age;
+
+        public static String getKeyName() {
+            return "user:";
+        }
+    }
+
+    /**
+     * 直接存储java bean
+     */
+    @Test
+    public void testHashBean() {
+        // users getUserById(int id)
+        int id = 1;
+        String key = User.getKeyName() + id;
+        if (jedis.exists(key)) {
+            Map<String, String> map = jedis.hgetAll(key);
+            System.out.println("map.get(\"id\") = " + map.get("id"));
+            System.out.println("map.get(\"name\") = " + map.get("name"));
+            System.out.println("map.get(\"password\") = " + map.get("password"));
+            System.out.println("map.get(\"age\") = " + map.get("age"));
+        } else {
+            User user = new User(id, "dongfang", "123456", 23);
+            Map<String, String> hash = new HashMap<>();
+            hash.put("id", user.getId() + "");
+            hash.put("name", user.getUserName());
+            hash.put("password", user.getPassword());
+            hash.put("age", user.getPassword() + "");
+            jedis.hmset(key, hash);
+            System.out.println("MySQL 查询的结果 是" + user);
+        }
 
     }
 }
