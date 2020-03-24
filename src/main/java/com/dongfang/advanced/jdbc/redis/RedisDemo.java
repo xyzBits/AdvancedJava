@@ -58,6 +58,10 @@ public class RedisDemo {
             jedis.set(key, result);
             System.out.println("数据库中查询得到 result = " + result);
         }
+    }
+
+    @Test
+    public void testHash() {
 
     }
 }
