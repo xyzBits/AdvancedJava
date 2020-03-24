@@ -1,7 +1,5 @@
 package com.dongfang.advanced.jdbc.redis;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,22 +83,11 @@ public class RedisDemo {
             jedis.hset(key, "name", "dongfang");
             jedis.hset(key, "age", "22");
             jedis.hset(key, "remark", "nan ");
+
         }
     }
 
-    @Data
-    @AllArgsConstructor
-    static
-    class User {
-        private int id;
-        private String userName;
-        private String password;
-        private int age;
 
-        public static String getKeyName() {
-            return "user:";
-        }
-    }
 
     /**
      * 直接存储java bean
