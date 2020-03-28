@@ -1,33 +1,123 @@
 package com.dongfang.advanced.jdbc.base;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Java为关系数据库定义了一套标准的访问接口：JDBC（Java Database Connectivity）
+ *
+ * 使用Java程序访问数据库时，Java代码并不是直接通过TCP连接去访问数据库，而是通过JDBC接口来访问，
+ * 而JDBC接口则通过JDBC驱动来实现真正对数据库的访问。
+ *
+ * 例如，我们在Java代码中如果要访问MySQL，那么必须编写代码操作JDBC接口。注意到JDBC接口是Java标准库自带的，
+ * 所以可以直接编译。而具体的JDBC驱动是由数据库厂商提供的，例如，MySQL的JDBC驱动由Oracle提供。因此，访问某个具体的数据库，
+ * 我们只需要引入该厂商提供的JDBC驱动，就可以通过JDBC接口来访问，这样保证了Java程序编写的是一套数据库访问代码，
+ * 却可以访问各种不同的数据库，因为他们都提供了标准的JDBC驱动：
+ *
+ * ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+ *
+ * │  ┌───────────────┐  │
+ *    │   Java App    │
+ * │  └───────────────┘  │
+ *            │
+ * │          ▼          │
+ *    ┌───────────────┐
+ * │  │JDBC Interface │<─┼─── JDK
+ *    └───────────────┘
+ * │          │          │
+ *            ▼
+ * │  ┌───────────────┐  │
+ *    │  JDBC Driver  │<───── Vendor
+ * │  └───────────────┘  │
+ *            │
+ * └ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ┘
+ *            ▼
+ *    ┌───────────────┐
+ *    │   Database    │
+ *    └───────────────┘
+ *
+ * 从代码来看，Java标准库自带的JDBC接口其实就是定义了一组接口，而某个具体的JDBC驱动其实就是实现了这些接口的类：
+ *
+ * ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+ *
+ * │  ┌───────────────┐  │
+ *    │   Java App    │
+ * │  └───────────────┘  │
+ *            │
+ * │          ▼          │
+ *    ┌───────────────┐
+ * │  │JDBC Interface │<─┼─── JDK
+ *    └───────────────┘
+ * │          │          │
+ *            ▼
+ * │  ┌───────────────┐  │
+ *    │ MySQL Driver  │<───── Oracle
+ * │  └───────────────┘  │
+ *            │
+ * └ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ┘
+ *            ▼
+ *    ┌───────────────┐
+ *    │     MySQL     │
+ *    └───────────────┘
+ * 实际上，一个MySQL的JDBC的驱动就是一个jar包，它本身也是纯Java编写的。
+ * 我们自己编写的代码只需要引用Java标准库提供的java.sql包下面的相关接口，
+ * 由此再间接地通过MySQL驱动的jar包通过网络访问MySQL服务器，所有复杂的网络通讯都被封装到JDBC驱动中，
+ * 因此，Java程序本身只需要引入一个MySQL驱动的jar包就可以正常访问MySQL服务器：
+ *
+ * ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+ *    ┌───────────────┐
+ * │  │   App.class   │  │
+ *    └───────────────┘
+ * │          │          │
+ *            ▼
+ * │  ┌───────────────┐  │
+ *    │  java.sql.*   │
+ * │  └───────────────┘  │
+ *            │
+ * │          ▼          │
+ *    ┌───────────────┐     TCP    ┌───────────────┐
+ * │  │ mysql-xxx.jar │──┼────────>│     MySQL     │
+ *    └───────────────┘            └───────────────┘
+ * └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+ *           JVM
+ * 小结
+ * 使用JDBC的好处是：
+ *
+ * 各数据库厂商使用相同的接口，Java代码不需要针对不同数据库分别开发；
+ *
+ * Java程序编译期仅依赖java.sql包，不依赖具体数据库的jar包；
+ *
+ * 可随时替换底层数据库，访问数据库的Java代码基本不变。
+ */
 public class JdbcDemo {
     private Connection connection;
 
+    @Ignore
     @Before
     public void prepare() throws SQLException {
         // 获取连接:
-        String JDBC_PASSWORD = "123456";
+        /*String JDBC_PASSWORD = "123456";
         String JDBC_USER = "root";
         // JDBC连接的URL, 不同数据库有不同的格式:
-        String JDBC_URL = "jdbc:mysql://localhost:3306/learnjdbc";
-        connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+        String JDBC_URL = "jdbc:mysql://localhost:3306/test";
+        connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);*/
     }
 
-
+    @Ignore
     @After
     public void after() throws SQLException {
-        connection.close();
+        // connection.close();
     }
 
     @Test
@@ -170,4 +260,102 @@ public class JdbcDemo {
             connection.setAutoCommit(true);
         }
     }
+
+    /**
+     * 使用JDBC操作数据库的时候，经常会执行一些批量操作。
+     *
+     * INSERT INTO coupons (user_id, type, expires) VALUES (123, 'DISCOUNT', '2030-12-31');
+     * INSERT INTO coupons (user_id, type, expires) VALUES (234, 'DISCOUNT', '2030-12-31');
+     * INSERT INTO coupons (user_id, type, expires) VALUES (345, 'DISCOUNT', '2030-12-31');
+     * INSERT INTO coupons (user_id, type, expires) VALUES (456, 'DISCOUNT', '2030-12-31');
+     *
+     * 实际上执行JDBC时，因为只有占位符参数不同，所以SQL实际上是一样的：
+     *
+     * for (var params : paramsList) {
+     *     PreparedStatement ps = conn.preparedStatement("INSERT INTO coupons (user_id, type, expires) VALUES (?,?,?)");
+     *     ps.setLong(params.get(0));
+     *     ps.setString(params.get(1));
+     *     ps.setString(params.get(2));
+     *     ps.executeUpdate();
+     * }
+     *
+     * 通过一个循环来执行每个PreparedStatement虽然可行，但是性能很低。SQL数据库对SQL语句相同，
+     * 但只有参数不同的若干语句可以作为batch执行，即批量执行，这种操作有特别优化，速度远远快于循环执行每个SQL
+     *
+     *在JDBC代码中，我们可以利用SQL数据库的这一特性，把同一个SQL但参数不同的若干次操作合并为一个batch执行。我们以批量插入为例，示例代码如下
+     *
+     * 执行batch和执行一个SQL不同点在于，需要对同一个PreparedStatement反复设置参数并调用addBatch()，这样就相当于给一个SQL加上了多组参数，相当于变成了“多行”SQL。
+     *
+     * 第二个不同点是调用的不是executeUpdate()，而是executeBatch()，因为我们设置了多组参数，相应地，返回结果也是多个int值，
+     * 因此返回类型是int[]，循环int[]数组即可获取每组参数执行后影响的结果数量。
+     */
+    @Test
+    public void testBatchUpdate() throws SQLException {
+        PreparedStatement ps = connection.prepareStatement("INSERT INTO students (name, gender, grade, score) VALUES (?, ?, ?, ?)");
+        // 对同一个PreparedStatement反复设置参数并调用addBatch():
+        /**
+         * for (String name : names) {
+            ps.setString(1, name);
+            ps.setBoolean(2, gender);
+            ps.setInt(3, grade);
+            ps.setInt(4, score);
+            ps.addBatch(); // 添加到batch
+        }*/
+        // 执行batch:
+        int[] ns = ps.executeBatch();
+        for (int n : ns) {
+            System.out.println(n + " inserted."); // batch中每个SQL执行的结果数量
+        }
+    }
+
+    /**
+     * 创建线程是一个昂贵的操作，如果有大量的小任务需要执行，并且频繁地创建和销毁线程，实际上会消耗大量的系统资源，
+     * 往往创建和消耗线程所耗费的时间比执行任务的时间还长，所以，为了提高效率，可以用线程池。
+     *
+     * 类似的，在执行JDBC的增删改查的操作时，如果每一次操作都来一次打开连接，操作，关闭连接，
+     * 那么创建和销毁JDBC连接的开销就太大了。为了避免频繁地创建和销毁JDBC连接，我们可以通过连接池（Connection Pool）复用已经创建好的连接。
+     *
+     * JDBC连接池有一个标准的接口javax.sql.DataSource，注意这个类位于Java标准库中，但仅仅是接口。
+     * 要使用JDBC连接池，我们必须选择一个JDBC连接池的实现。常用的JDBC连接池有：
+     *
+     * HikariCP
+     * C3P0
+     * BoneCP
+     * Druid
+     *
+     * 注意创建DataSource也是一个非常昂贵的操作，所以通常DataSource实例总是作为一个全局变量存储，并贯穿整个应用程序的生命周期。
+     *
+     * 有了连接池以后，我们如何使用它呢？和前面的代码类似，只是获取Connection时，把DriverManage.getConnection()改为ds.getConnection()：
+     *
+     * 通过连接池获取连接时，并不需要指定JDBC的相关URL、用户名、口令等信息，因为这些信息已经存储在连接池内部了
+     * （创建HikariDataSource时传入的HikariConfig持有这些信息）。一开始，连接池内部并没有连接，
+     * 所以，第一次调用ds.getConnection()，会迫使连接池内部先创建一个Connection，再返回给客户端使用。
+     * 当我们调用conn.close()方法时（在try(resource){...}结束处），不是真正“关闭”连接，而是释放到连接池中，以便下次获取连接时能直接返回。
+     *
+     * 因此，连接池内部维护了若干个Connection实例，如果调用ds.getConnection()，就选择一个空闲连接，
+     * 并标记它为“正在使用”然后返回，如果对Connection调用close()，那么就把连接再次标记为“空闲”从而等待下次调用。
+     * 这样一来，我们就通过连接池维护了少量连接，但可以频繁地执行大量的SQL语句。
+     *
+     * 通常连接池提供了大量的参数可以配置，例如，维护的最小、最大活动连接数，指定一个连接在空闲一段时间后自动关闭等，
+     * 需要根据应用程序的负载合理地配置这些参数。此外，大多数连接池都提供了详细的实时状态以便进行监控。
+     * @throws SQLException
+     */
+    @Test
+    public void testConnectionPool() throws SQLException {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl("jdbc:mysql://localhost:3306/test?serverTimezone=UTC");
+        hikariConfig.setUsername("root");
+        hikariConfig.setPassword("123456");
+        hikariConfig.addDataSourceProperty("connectionTimeout", "1000"); // 连接超时：1秒
+        hikariConfig.addDataSourceProperty("idleTimeout", "60000"); // 空闲超时：60秒
+        hikariConfig.addDataSourceProperty("maximumPoolSize", "10"); // 最大连接数：10
+
+        DataSource dataSource = new HikariDataSource(hikariConfig);
+        Connection connection = dataSource.getConnection();
+        System.out.println("connection = " + connection);
+        PreparedStatement ps = connection.prepareStatement("create database learnjdbc");
+        boolean ans = ps.execute();
+        System.out.println("ans = " + ans);
+    }
+
 }
